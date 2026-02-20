@@ -1,31 +1,25 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:atlas_app/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // Riverpod'u testlere de ekliyoruz
+import 'package:atlas_app/main.dart'; // Senin projendeki main.dart dosyası
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Uygulama açılış ve giriş ekranı testi', (WidgetTester tester) async {
+    // 1. UYGULAMAYI BAŞLAT:
+    // Riverpod kullandığımız için test ortamında da uygulamayı ProviderScope ile sarmalamak zorundayız.
     await tester.pumpWidget(const ProviderScope(child: OzelEgitimApp()));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Ekranın tam çizilmesi ve animasyonların bitmesi için biraz bekle komutu
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // 2. KONTROL ET (Test):
+    // Ekranda "Tekrar Hoş Geldiniz" yazısı var mı? (LoginScreen'deki başlığımız)
+    expect(find.text('Tekrar Hoş Geldiniz'), findsOneWidget);
 
-    // Verify that our counter has incremented.
+    // Ekranda "Giriş Yap" yazan bir buton veya metin var mı?
+    expect(find.text('Giriş Yap'), findsWidgets);
+
+    // Eski sayaç mantığındaki "0" yazısının OLMADIĞINI doğrula
     expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
   });
 }
