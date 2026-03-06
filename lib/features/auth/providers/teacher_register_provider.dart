@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/parent_register_state.dart';
+import '../models/teacher_register_state.dart';
 
-class ParentRegisterViewModel extends StateNotifier<ParentRegisterUiState> {
-  ParentRegisterViewModel() : super(ParentRegisterUiState());
+class TeacherRegisterViewModel extends StateNotifier<TeacherRegisterUiState> {
+  TeacherRegisterViewModel() : super(TeacherRegisterUiState());
 
-  // Controller'lar burada güvende, sayfa rebuild olsa da odak kaybolmaz
+  // Controller'lar burada sabit kalarak klavye sorununu çözer
+  final codeController = TextEditingController();
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
@@ -19,7 +20,8 @@ class ParentRegisterViewModel extends StateNotifier<ParentRegisterUiState> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     final phoneRegex = RegExp(r'^05[0-9]{9}$');
 
-    final isValid = nameController.text.isNotEmpty &&
+    final isValid = codeController.text.isNotEmpty &&
+        nameController.text.isNotEmpty &&
         emailRegex.hasMatch(emailController.text) &&
         phoneRegex.hasMatch(phoneController.text.replaceAll(' ', '')) &&
         passwordController.text.length >= 6 &&
@@ -30,6 +32,7 @@ class ParentRegisterViewModel extends StateNotifier<ParentRegisterUiState> {
 
   @override
   void dispose() {
+    codeController.dispose();
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
@@ -39,6 +42,6 @@ class ParentRegisterViewModel extends StateNotifier<ParentRegisterUiState> {
   }
 }
 
-final parentRegisterProvider = StateNotifierProvider<ParentRegisterViewModel, ParentRegisterUiState>((ref) {
-  return ParentRegisterViewModel();
+final teacherRegisterProvider = StateNotifierProvider<TeacherRegisterViewModel, TeacherRegisterUiState>((ref) {
+  return TeacherRegisterViewModel();
 });

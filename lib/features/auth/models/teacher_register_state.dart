@@ -1,20 +1,20 @@
-class ParentRegisterUiState {
+class TeacherRegisterUiState {
   final bool obscurePassword;
   final bool obscureConfirmPassword;
   final bool isFormValid;
 
-  ParentRegisterUiState({
+  TeacherRegisterUiState({
     this.obscurePassword = true,
     this.obscureConfirmPassword = true,
     this.isFormValid = false,
   });
 
-  ParentRegisterUiState copyWith({
+  TeacherRegisterUiState copyWith({
     bool? obscurePassword,
     bool? obscureConfirmPassword,
     bool? isFormValid,
   }) {
-    return ParentRegisterUiState(
+    return TeacherRegisterUiState(
       obscurePassword: obscurePassword ?? this.obscurePassword,
       obscureConfirmPassword: obscureConfirmPassword ?? this.obscureConfirmPassword,
       isFormValid: isFormValid ?? this.isFormValid,

@@ -23,7 +23,7 @@ class OzelEgitimApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           
           // --- NAVİGASYON AYARLARI ---
-          initialRoute: AppRouter.login, // Uygulama hangi sayfayla başlasın?
+          initialRoute: AppRouter.rdtResult, // Uygulama hangi sayfayla başlasın?
           onGenerateRoute: AppRouter.generateRoute, // Rotaları kim yönetsin?
         );
       },

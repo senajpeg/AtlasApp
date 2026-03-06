@@ -1,65 +1,17 @@
-import 'package:atlas_app/core/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:atlas_app/core/theme.dart';
+import 'package:atlas_app/core/app_router.dart';
+import '../providers/teacher_register_provider.dart';
 
-class TeacherRegisterScreen extends StatefulWidget {
+class TeacherRegisterScreen extends ConsumerWidget {
   const TeacherRegisterScreen({super.key});
 
   @override
-  State<TeacherRegisterScreen> createState() => _TeacherRegisterScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uiState = ref.watch(teacherRegisterProvider);
+    final viewModel = ref.read(teacherRegisterProvider.notifier);
 
-class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-
-  // Kontrolcüler
-  final _codeController = TextEditingController();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _codeController.addListener(() => setState(() {}));
-    _nameController.addListener(() => setState(() {}));
-    _emailController.addListener(() => setState(() {}));
-    _phoneController.addListener(() => setState(() {}));
-    _passwordController.addListener(() => setState(() {}));
-    _confirmPasswordController.addListener(() => setState(() {}));
-  }
-
-  bool get _isFormValid {
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    final phoneRegex = RegExp(r'^05[0-9]{9}$');
-
-    return _codeController.text.isNotEmpty && 
-           _nameController.text.isNotEmpty &&
-           emailRegex.hasMatch(_emailController.text) &&
-           phoneRegex.hasMatch(_phoneController.text.replaceAll(' ', '')) &&
-           _passwordController.text.length >= 6 &&
-           _passwordController.text == _confirmPasswordController.text;
-  }
-
-  @override
-  void dispose() {
-    _codeController.dispose();
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -74,15 +26,13 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
           style: TextStyle(color: Colors.black, fontSize: 17.sp, fontWeight: FontWeight.w600),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-        child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- BİLGİ KUTUCUĞU ---
+              // --- SENİN ÖZEL BİLGİ KUTUCUĞUN ---
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -105,10 +55,12 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
               ),
               SizedBox(height: 3.h),
 
+              // --- KURUM BİLGİLERİ ---
               _buildSectionTitle("KURUM BİLGİLERİ"),
               _buildFieldLabel("Kurum Davet Kodu"),
               TextFormField(
-                controller: _codeController,
+                controller: viewModel.codeController,
+                onChanged: (_) => viewModel.checkValidation(),
                 decoration: InputDecoration(
                   hintText: "Örn: ZIL-9X2A",
                   prefixIcon: const Icon(Icons.lock_open_outlined, color: Colors.blue),
@@ -117,43 +69,32 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
                     borderSide: const BorderSide(color: Colors.blue, width: 1.5),
                   ),
                 ),
-                validator: (v) => (v == null || v.isEmpty) ? "Davet kodu gerekli" : null,
               ),
               const Divider(height: 40),
 
+              // --- KİŞİSEL BİLGİLER ---
               _buildSectionTitle("KİŞİSEL BİLGİLER"),
               _buildFieldLabel("Ad Soyad"),
-              _buildTextField(_nameController, "Örn: Ayşe Demir", Icons.person_outline, (v) => v!.isEmpty ? "Ad Soyad gerekli" : null),
+              _buildTextField(viewModel.nameController, "Örn: Ayşe Demir", Icons.person_outline, viewModel.checkValidation),
               
               SizedBox(height: 2.h),
               _buildFieldLabel("E-posta Adresi"),
-              _buildTextField(_emailController, "ornek@email.com", Icons.email_outlined, (v) {
-                if (v == null || v.isEmpty) return "E-posta gerekli";
-                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) return "Lütfen doğru email formatında giriniz";
-                return null;
-              }, keyboardType: TextInputType.emailAddress),
+              _buildTextField(viewModel.emailController, "ornek@email.com", Icons.email_outlined, viewModel.checkValidation, keyboardType: TextInputType.emailAddress),
 
               SizedBox(height: 2.h),
               _buildFieldLabel("Telefon Numarası"),
-              _buildTextField(_phoneController, "0555 123 45 67", Icons.phone_outlined, (v) {
-                if (v == null || v.isEmpty) return "Telefon gerekli";
-                if (!RegExp(r'^05[0-9]{9}$').hasMatch(v.replaceAll(' ', ''))) return "Geçerli bir telefon numarası giriniz (05xx...)";
-                return null;
-              }, keyboardType: TextInputType.phone),
+              _buildTextField(viewModel.phoneController, "0555 123 45 67", Icons.phone_outlined, viewModel.checkValidation, keyboardType: TextInputType.phone),
               
               const Divider(height: 40),
 
+              // --- HESAP GÜVENLİĞİ ---
               _buildSectionTitle("HESAP GÜVENLİĞİ"),
               _buildFieldLabel("Şifre"),
-              _buildPasswordField(_passwordController, "••••••••", _obscurePassword, () {
-                setState(() => _obscurePassword = !_obscurePassword);
-              }, (v) => (v != null && v.length < 6) ? "Şifre en az 6 karakter olmalıdır" : null),
+              _buildPasswordField(viewModel.passwordController, "••••••••", uiState.obscurePassword, viewModel.togglePassword, viewModel.checkValidation),
 
               SizedBox(height: 2.h),
               _buildFieldLabel("Şifre Tekrar"),
-              _buildPasswordField(_confirmPasswordController, "••••••••", _obscureConfirmPassword, () {
-                setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-              }, (v) => v != _passwordController.text ? "Şifreler eşleşmiyor" : null),
+              _buildPasswordField(viewModel.confirmPasswordController, "••••••••", uiState.obscureConfirmPassword, viewModel.toggleConfirmPassword, viewModel.checkValidation),
 
               SizedBox(height: 4.h),
 
@@ -162,13 +103,11 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: _isFormValid ? () {
-                    // Kayıt başarılı işlemi sonrası Login'e dönüş
+                  onPressed: uiState.isFormValid ? () {
                     Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (route) => false);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Öğretmen kaydı alındı! Giriş yapabilirsiniz.")));
                   } : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isFormValid ? const Color(0xFF1E88E5) : Colors.grey.shade400,
+                    backgroundColor: uiState.isFormValid ? const Color(0xFF1E88E5) : Colors.grey.shade400,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   child: const Text("Öğretmen Olarak Kayıt Ol", style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -178,7 +117,6 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
               SizedBox(height: 2.h),
               Center(
                 child: GestureDetector(
-                  // İŞTE KRİTİK DEĞİŞİKLİK: Login sayfasına AppRouter üzerinden dönüyoruz
                   onTap: () => Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (route) => false),
                   child: RichText(
                     text: TextSpan(
@@ -199,7 +137,7 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
     );
   }
 
-  // --- HELPER METODLAR (Aynı kaldı) ---
+  // --- SENİN ÖZEL HELPER METODLARIN ---
   Widget _buildSectionTitle(String title) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey, fontSize: 12)),
@@ -210,9 +148,9 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
         child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87)),
       );
 
-  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, String? Function(String?)? validator, {TextInputType? keyboardType}) => TextFormField(
+  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, VoidCallback onChanged, {TextInputType? keyboardType}) => TextFormField(
         controller: controller,
-        validator: validator,
+        onChanged: (_) => onChanged(),
         keyboardType: keyboardType,
         decoration: InputDecoration(
           hintText: hint,
@@ -220,10 +158,10 @@ class _TeacherRegisterScreenState extends State<TeacherRegisterScreen> {
         ),
       );
 
-  Widget _buildPasswordField(TextEditingController controller, String hint, bool obscure, VoidCallback toggle, String? Function(String?)? validator) => TextFormField(
+  Widget _buildPasswordField(TextEditingController controller, String hint, bool obscure, VoidCallback toggle, VoidCallback onChanged) => TextFormField(
         controller: controller,
         obscureText: obscure,
-        validator: validator,
+        onChanged: (_) => onChanged(),
         decoration: InputDecoration(
           hintText: hint,
           prefixIcon: const Icon(Icons.key_outlined, color: Colors.grey),
