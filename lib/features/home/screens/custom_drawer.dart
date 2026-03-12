@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import '../providers/drawer_provider.dart';
-import 'package:atlas_app/core/app_router.dart'; // Router importunu eklemeyi unutma
+import 'package:atlas_app/core/app_router.dart';
 
 class CustomDrawer extends ConsumerWidget {
-  const CustomDrawer({super.key});
+  final bool isTeacher; // Parametre olarak rolü alıyoruz
+
+  const CustomDrawer({
+    super.key, 
+    this.isTeacher = false, // Varsayılan olarak veli (false)
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,31 +22,36 @@ class CustomDrawer extends ConsumerWidget {
       backgroundColor: Colors.white,
       child: Column(
         children: [
-          // Mavi Header Alanı [cite: 242]
-          _buildHeader(),
+          // Parametreden gelen bilgiye göre Header oluşur
+          _buildHeader(isTeacher),
 
-          // Menü Öğeleri [cite: 244, 246, 247, 248, 249, 250]
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 _buildItem(context, ref, 0, Icons.grid_view_rounded, "Anasayfa", selectedIndex == 0),
-                _buildItem(context, ref, 1, Icons.assignment_outlined, "Risk Değerlendirme", selectedIndex == 1),
-                _buildItem(context, ref, 2, Icons.tablet_android_outlined, "Materyal Desteği", selectedIndex == 2),
-                _buildItem(context, ref, 3, Icons.stacked_line_chart_rounded, "İzleme - Raporlama", selectedIndex == 3),
+                _buildItem(context, ref, 1, Icons.assignment_outlined, "Risk Değerlendirme (RDT)", selectedIndex == 1),
+                
+                // Sadece öğretmense BEP Hazırlama görünür
+                if (isTeacher)
+                  _buildItem(context, ref, 2, Icons.description_outlined, "BEP Hazırlama", selectedIndex == 2),
+                
+                _buildItem(context, ref, 3, Icons.tablet_android_outlined, "Materyal Desteği", selectedIndex == 3),
+                _buildItem(context, ref, 4, Icons.stacked_line_chart_rounded, "İzleme - Raporlama", selectedIndex == 4),
                 
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Divider(),
                 ),
 
-                _buildItem(context, ref, 4, Icons.person_outline, "Profil", selectedIndex == 4),
-                _buildItem(context, ref, 5, Icons.people_outline, "Öğrencilerim", selectedIndex == 5),
+                _buildItem(context, ref, 5, Icons.person_outline, "Profil", selectedIndex == 5),
+                
+                // Alt etiket role göre değişir
+                _buildItem(context, ref, 6, Icons.people_outline, isTeacher ? "Öğrencilerim" : "Çocuklarım", selectedIndex == 6),
               ],
             ),
           ),
 
-          // Çıkış Yap ve Versiyon [cite: 251, 252]
           _buildFooter(),
         ],
       ),
@@ -55,10 +65,7 @@ class CustomDrawer extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         selected: isSelected,
         selectedTileColor: const Color(0xFFE3F2FD), 
-        leading: Icon(
-          icon, 
-          color: isSelected ? const Color(0xFF2196F3) : Colors.grey[600]
-        ),
+        leading: Icon(icon, color: isSelected ? const Color(0xFF2196F3) : Colors.grey[600]),
         title: Text(
           title, 
           style: TextStyle(
@@ -68,24 +75,22 @@ class CustomDrawer extends ConsumerWidget {
           )
         ),
         onTap: () {
-          // 1. Menü state'ini güncelle
           ref.read(drawerIndexProvider.notifier).state = index;
+          Navigator.pop(context); // Tıklandığında menüyü kapatır
           
-          // 2. Drawer'ı (yandan açılır menüyü) kapat
-          Navigator.pop(context);
-
-          // 3. Tıklanan öğeye göre yönlendirme yap
+          // Yönlendirmeler
           if (index == 1) {
-            // Risk Değerlendirme tıklandığında Sayfa 4'e git [cite: 58, 60]
             Navigator.pushNamed(context, AppRouter.rdtAgeSelection);
+          } else if (index == 2) {
+            // BEP Hazırlama tıklandığında Ders Seçimi ekranına gider
+            Navigator.pushNamed(context, AppRouter.bepSubjectSelection);
           }
-          // Diğer sayfalar için buraya else-if ekleyebilirsin
         },
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(bool teacherMode) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.only(top: 8.h, bottom: 4.h, left: 6.w),
@@ -99,8 +104,14 @@ class CustomDrawer extends ConsumerWidget {
             child: Icon(Icons.person, color: Colors.white, size: 30),
           ),
           SizedBox(height: 2.h),
-          Text("Hoşgeldiniz,", style: TextStyle(color: Colors.white70, fontSize: 16.sp)),
-          Text("Ahmet Veli", style: TextStyle(color: Colors.white, fontSize: 19.sp, fontWeight: FontWeight.bold)),
+          Text(
+            teacherMode ? "Ahmet Yılmaz" : "Ahmet Veli", 
+            style: TextStyle(color: Colors.white, fontSize: 18.sp, fontWeight: FontWeight.bold)
+          ),
+          Text(
+            teacherMode ? "Özel Eğitim Öğretmeni" : "Ebeveyn", 
+            style: TextStyle(color: Colors.white70, fontSize: 14.sp, fontWeight: FontWeight.w400)
+          ),
         ],
       ),
     );
@@ -112,13 +123,11 @@ class CustomDrawer extends ConsumerWidget {
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.redAccent),
           title: Text("Çıkış Yap", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16.sp)),
-          onTap: () {
-            // Çıkış işlemleri buraya
-          },
+          onTap: () {},
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 2.h),
-          child: Text("ÖZEL EĞİTİM PLATFORMU V1.0.4", style: TextStyle(color: Colors.grey, fontSize: 13.sp)),
+          child: Text("ATLAS ÖZEL EĞİTİM V1.0.4", style: TextStyle(color: Colors.grey, fontSize: 13.sp)),
         ),
       ],
     );

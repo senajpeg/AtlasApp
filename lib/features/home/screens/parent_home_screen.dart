@@ -17,7 +17,7 @@ class ParentHomeScreen extends ConsumerWidget {
     return Scaffold(
       key: scaffoldKey, // Scaffold'a key'i tanımladık
       backgroundColor: const Color(0xFFF8F9FA),
-      drawer: const CustomDrawer(), // Yandan açılacak menü bileşeni
+      drawer: const CustomDrawer(isTeacher:false), // Yandan açılacak menü bileşeni
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
