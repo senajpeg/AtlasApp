@@ -3,8 +3,10 @@ import 'package:atlas_app/features/auth/screens/manager_register_screen.dart';
 import 'package:atlas_app/features/auth/screens/parent_register_screen.dart';
 import 'package:atlas_app/features/auth/screens/teacher_register_screen.dart';
 import 'package:atlas_app/features/bep/screens/bep_goal_selection_screen.dart';
+import 'package:atlas_app/features/bep/screens/bep_pdf_preview_screen.dart';
 import 'package:atlas_app/features/bep/screens/bep_performance_screen.dart';
 import 'package:atlas_app/features/bep/screens/bep_subject_selection_screen.dart';
+import 'package:atlas_app/features/bep/screens/bep_success_screen.dart';
 import 'package:atlas_app/features/bep/screens/bep_summary_screen.dart';
 import 'package:atlas_app/features/expert/screens/experts_screen.dart';
 import 'package:atlas_app/features/home/screens/parent_home_screen.dart';
@@ -33,6 +35,8 @@ class AppRouter {
   static const String bepPerformance = '/bep-performance';
   static const String bepPerformanceSummary = '/bep-performance-summary';
   static const String bepGoals = '/bep-goals';
+  static const String bepResultScreen = '/bep-result-screen';
+  static const String bepPdfPreview = '/bep-pdf-preview';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -87,12 +91,18 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const BepPerformanceScreen());
 
       case bepPerformanceSummary:
-        return MaterialPageRoute(builder: (_) => const BepPerformanceSummaryScreen());  
+        return MaterialPageRoute(
+          builder: (_) => const BepPerformanceSummaryScreen(),
+        );
 
       case bepGoals:
-        return MaterialPageRoute(builder: (_) => const BepGoalsScreen());  
+        return MaterialPageRoute(builder: (_) => const BepGoalsScreen());
 
+      case bepResultScreen:
+        return MaterialPageRoute(builder: (_) => const BepResultScreen());
 
+      case bepPdfPreview:
+        return MaterialPageRoute(builder: (_) => const BepPdfPreviewScreen());
 
       default:
         return MaterialPageRoute(

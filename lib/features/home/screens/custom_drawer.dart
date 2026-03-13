@@ -52,7 +52,8 @@ class CustomDrawer extends ConsumerWidget {
             ),
           ),
 
-          _buildFooter(),
+          // DÜZELTME: context parametresini içeri gönderiyoruz
+          _buildFooter(context),
         ],
       ),
     );
@@ -117,13 +118,21 @@ class CustomDrawer extends ConsumerWidget {
     );
   }
 
-  Widget _buildFooter() {
+  // DÜZELTME: BuildContext context parametresini buraya ekledik
+  Widget _buildFooter(BuildContext context) {
     return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.redAccent),
           title: Text("Çıkış Yap", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16.sp)),
-          onTap: () {},
+          onTap: () {
+            // Geçmişteki tüm rotaları silip Login ekranına yönlendirir
+            Navigator.pushNamedAndRemoveUntil(
+              context, 
+              AppRouter.login, 
+              (route) => false,
+            );
+          },
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 2.h),

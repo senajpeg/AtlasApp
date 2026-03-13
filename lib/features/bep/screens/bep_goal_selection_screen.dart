@@ -156,7 +156,7 @@ class _BepGoalsScreenState extends ConsumerState<BepGoalsScreen> {
                           ? () {
                               final udaList = _selectedUda != null ? [_selectedUda!] : <String>[];
                               bepNotifier.saveGoals(udaList, List.from(_selectedKda));
-                              // TODO: 16. Sayfa (Rapor Başarılı) ekranına yönlendirilecek
+                              Navigator.pushNamed(context, AppRouter.bepResultScreen);
                             }
                           : null,
                       style: ElevatedButton.styleFrom(

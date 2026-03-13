@@ -28,9 +28,9 @@ class LoginScreen extends ConsumerWidget {
               Text(
                 'Tekrar Hoşgeldiniz',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textDark,
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 1.5.h),
@@ -40,7 +40,7 @@ class LoginScreen extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 5.h),
-              
+
               Text(
                 'GİRİŞ ROLÜ',
                 style: TextStyle(
@@ -61,9 +61,24 @@ class LoginScreen extends ConsumerWidget {
                 ),
                 child: Row(
                   children: [
-                    _buildRoleButton(ref, AppRole.veli, 'Veli', uiState.selectedRole),
-                    _buildRoleButton(ref, AppRole.ogretmen, 'Öğretmen', uiState.selectedRole),
-                    _buildRoleButton(ref, AppRole.yonetici, 'Yönetici', uiState.selectedRole),
+                    _buildRoleButton(
+                      ref,
+                      AppRole.veli,
+                      'Veli',
+                      uiState.selectedRole,
+                    ),
+                    _buildRoleButton(
+                      ref,
+                      AppRole.ogretmen,
+                      'Öğretmen',
+                      uiState.selectedRole,
+                    ),
+                    _buildRoleButton(
+                      ref,
+                      AppRole.yonetici,
+                      'Yönetici',
+                      uiState.selectedRole,
+                    ),
                   ],
                 ),
               ),
@@ -78,11 +93,14 @@ class LoginScreen extends ConsumerWidget {
                 decoration: const InputDecoration(
                   labelText: 'E-posta Adresi',
                   hintText: 'ornek@eposta.com',
-                  prefixIcon: Icon(Icons.email_outlined, color: AppColors.textGrey),
+                  prefixIcon: Icon(
+                    Icons.email_outlined,
+                    color: AppColors.textGrey,
+                  ),
                 ),
               ),
               SizedBox(height: 2.h),
-              
+
               // ŞİFRE
               TextField(
                 controller: viewModel.passwordController,
@@ -91,7 +109,10 @@ class LoginScreen extends ConsumerWidget {
                 decoration: const InputDecoration(
                   labelText: 'Şifre',
                   hintText: '••••••••',
-                  prefixIcon: Icon(Icons.lock_outline, color: AppColors.textGrey),
+                  prefixIcon: Icon(
+                    Icons.lock_outline,
+                    color: AppColors.textGrey,
+                  ),
                 ),
               ),
 
@@ -101,7 +122,10 @@ class LoginScreen extends ConsumerWidget {
                   onPressed: () {},
                   child: const Text(
                     'Şifremi Unuttum',
-                    style: TextStyle(color: AppColors.textGrey, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: AppColors.textGrey,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -110,11 +134,33 @@ class LoginScreen extends ConsumerWidget {
 
               // GİRİŞ BUTONU
               ElevatedButton(
-                onPressed: uiState.isButtonActive ? () {
-                  // Giriş mantığı buraya gelecek
-                } : null,
+                onPressed: uiState.isButtonActive
+                    ? () {
+                        // Seçili role göre ilgili ana sayfaya yönlendirme yapıyoruz
+                        if (uiState.selectedRole == AppRole.veli) {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRouter.parentHome,
+                          );
+                        } else if (uiState.selectedRole == AppRole.ogretmen) {
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRouter.teacherHome,
+                          );
+                        } else if (uiState.selectedRole == AppRole.yonetici) {
+                          // Yönetici ana sayfası henüz yoksa geçici olarak Teacher Home'a atıyoruz
+                          // İleride burayı AppRouter.managerHome olarak güncelleyebilirsin
+                          Navigator.pushReplacementNamed(
+                            context,
+                            AppRouter.teacherHome,
+                          );
+                        }
+                      }
+                    : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: uiState.isButtonActive ? AppColors.primaryBlue : Colors.grey.shade400,
+                  backgroundColor: uiState.isButtonActive
+                      ? AppColors.primaryBlue
+                      : Colors.grey.shade400,
                 ),
                 child: const Text('Giriş Yap', style: TextStyle(fontSize: 16)),
               ),
@@ -138,16 +184,19 @@ class LoginScreen extends ConsumerWidget {
                       text: uiState.selectedRole == AppRole.veli
                           ? 'Hesabınız yok mu? '
                           : uiState.selectedRole == AppRole.ogretmen
-                              ? 'Kurum kodunuz var mı? '
-                              : 'Kurumunuzu eklemek mi istiyorsunuz? ',
-                      style: TextStyle(color: AppColors.textGrey, fontSize: 15.sp),
+                          ? 'Kurum kodunuz var mı? '
+                          : 'Kurumunuzu eklemek mi istiyorsunuz? ',
+                      style: TextStyle(
+                        color: AppColors.textGrey,
+                        fontSize: 15.sp,
+                      ),
                       children: [
                         TextSpan(
                           text: uiState.selectedRole == AppRole.veli
                               ? 'Hemen Kaydolun'
                               : uiState.selectedRole == AppRole.ogretmen
-                                  ? 'Öğretmen Kaydı'
-                                  : 'Kurum Kaydet',
+                              ? 'Öğretmen Kaydı'
+                              : 'Kurum Kaydet',
                           style: const TextStyle(
                             color: AppColors.primaryBlue,
                             fontWeight: FontWeight.bold,
@@ -165,7 +214,12 @@ class LoginScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRoleButton(WidgetRef ref, AppRole role, String text, AppRole selectedRole) {
+  Widget _buildRoleButton(
+    WidgetRef ref,
+    AppRole role,
+    String text,
+    AppRole selectedRole,
+  ) {
     final isSelected = selectedRole == role;
     return Expanded(
       child: GestureDetector(
