@@ -1,4 +1,5 @@
 // custom_drawer.dart
+import 'package:atlas_app/features/auth/providers/login_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -52,8 +53,8 @@ class CustomDrawer extends ConsumerWidget {
             ),
           ),
 
-          // DÜZELTME: context parametresini içeri gönderiyoruz
-          _buildFooter(context),
+          // DÜZELTME 1: context'in yanına ref parametresini de içeri gönderiyoruz
+          _buildFooter(context, ref),
         ],
       ),
     );
@@ -118,14 +119,18 @@ class CustomDrawer extends ConsumerWidget {
     );
   }
 
-  // DÜZELTME: BuildContext context parametresini buraya ekledik
-  Widget _buildFooter(BuildContext context) {
+  // DÜZELTME 2: BuildContext'in yanına WidgetRef ref parametresini ekledik
+  Widget _buildFooter(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.logout, color: Colors.redAccent),
           title: Text("Çıkış Yap", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 16.sp)),
           onTap: () {
+            // Textfield'ları sıfırlıyoruz
+            ref.read(loginProvider.notifier).emailController.clear();
+            ref.read(loginProvider.notifier).passwordController.clear();
+            
             // Geçmişteki tüm rotaları silip Login ekranına yönlendirir
             Navigator.pushNamedAndRemoveUntil(
               context, 
